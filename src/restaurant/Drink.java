@@ -13,24 +13,61 @@ public class Drink extends Dish {
         this.isJuice = isJuice;
         this.isAlcoholic = isAlcoholic;
         calculateProductionCost();
+        calculateSellingPrice();
     }
 
-    @Override
-    public void calculateProductionCost() {
-        double total = ingredients.stream().mapToDouble(i -> i.getPrice()).sum();
+    private void calculateProductionCost() {
+        double baseCost = getIngredientsCostSum();
 
         if (isMilkshake) {
-            productionCost = total * 1.15;
+            setProductionCost(baseCost * 1.15);
         } else if (isJuice) {
-            productionCost = total * 1.10;
+            setProductionCost(baseCost * 1.10);
         } else {
-            productionCost = total;
+            setProductionCost(baseCost); // default if neither milkshake nor juice
         }
 
         if (isAlcoholic) {
-            productionCost += 400;
+            setProductionCost(getProductionCost() + 400);
         }
+    }
 
-        sellingPrice = productionCost + 1000;
+    private double getIngredientsCostSum() {
+        double sum = 0;
+        for (Ingredient ingredient : getIngredients()) {
+            sum += ingredient.getPrice();
+        }
+        return sum;
+    }
+
+    private void calculateSellingPrice() {
+        setSellingPrice(getProductionCost() + 1000);
+    }
+
+    @Override
+    public boolean canBePrepared(List<Ingredient> inventory) {
+        for (Ingredient ingredient : getIngredients()) {
+            boolean found = false;
+            for (Ingredient invIngredient : inventory) {
+                if (invIngredient.getName().equalsIgnoreCase(ingredient.getName())
+                        && invIngredient.getAmount() >= ingredient.getAmount()) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void prepare(List<Ingredient> inventory) {
+        for (Ingredient ingredient : getIngredients()) {
+            for (Ingredient invIngredient : inventory) {
+                if (invIngredient.getName().equalsIgnoreCase(ingredient.getName())) {
+                    invIngredient.setAmount(invIngredient.getAmount() - ingredient.getAmount());
+                }
+            }
+        }
     }
 }

@@ -8,7 +8,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         int choice;
 
-        System.out.println(" Welcome to the Restaurant Manager");
+        System.out.println("Welcome to the Restaurant Manager");
 
         do {
             System.out.println("\nMenu:\n1. Show current money\n2. Show ingredients\n3. Buy ingredients\n4. Show dishes\n5. Sell dish\n6. Exit");
@@ -16,7 +16,7 @@ public class Main {
             choice = scanner.nextInt();
 
             switch (choice) {
-                case 1 -> restaurant.printMoney();
+                case 1 -> restaurant.printCurrentMoney();
                 case 2 -> restaurant.printIngredientInventory();
                 case 3 -> {
                     restaurant.printIngredientInventory();
@@ -24,7 +24,7 @@ public class Main {
                     int idx = scanner.nextInt();
                     System.out.print("Enter quantity to buy: ");
                     int qty = scanner.nextInt();
-                    restaurant.buyIngredient(idx, qty);
+                    restaurant.buyIngredient(idx, qty);  // Cambiado para que reciba índice en vez de nombre
                 }
                 case 4 -> restaurant.printDishes();
                 case 5 -> {
@@ -33,8 +33,8 @@ public class Main {
                     int idx = scanner.nextInt();
                     restaurant.sellDish(idx);
                 }
-                case 6 -> System.out.println(" Goodbye!");
-                default -> System.out.println(" Invalid option.");
+                case 6 -> System.out.println("Goodbye!");
+                default -> System.out.println("Invalid option.");
             }
         } while (choice != 6);
     }

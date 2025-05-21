@@ -3,30 +3,57 @@ package restaurant;
 import java.util.List;
 
 public class Dessert extends Dish {
-    private boolean isHot;
-    private int calories;
+    private boolean isCold;
+    private double weight;
 
-    public Dessert(String name, List<Ingredient> ingredients, boolean isHot, int calories) {
+    public Dessert(String name, List<Ingredient> ingredients, boolean isCold, double weight) {
         super(name, ingredients);
-        this.isHot = isHot;
-        this.calories = calories;
-        calculateProductionCost();
+        this.isCold = isCold;
+        this.weight = weight;
+
+        // Suponiendo que calculas costos y precio aquí:
+        double cost = calculateCost(ingredients);
+        setProductionCost(cost);
+        setSellingPrice(cost * 2);  // Por ejemplo, margen 100%
+    }
+
+    private double calculateCost(List<Ingredient> ingredients) {
+        double total = 0;
+        for (Ingredient ing : ingredients) {
+            total += ing.getPrice();
+        }
+        return total;
     }
 
     @Override
-    public void calculateProductionCost() {
-        double total = ingredients.stream().mapToDouble(i -> i.getPrice()).sum();
-
-        if (isHot) {
-            productionCost = total * 1.20;
-        } else {
-            productionCost = total * 1.12;
+    public boolean canBePrepared(List<Ingredient> inventory) {
+        for (Ingredient needed : getIngredients()) {
+            boolean found = false;
+            for (Ingredient inv : inventory) {
+                if (inv.getName().equalsIgnoreCase(needed.getName()) && inv.getAmount() >= needed.getAmount()) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) return false;
         }
-
-        sellingPrice = productionCost + 1000;
+        return true;
     }
 
-    public int getCalories() {
-        return calories;
+    @Override
+    public void prepare(List<Ingredient> inventory) {
+        if (!canBePrepared(inventory)) {
+            System.out.println("No se puede preparar el postre: " + getName());
+            return;
+        }
+        // descontar ingredientes del inventario
+        for (Ingredient needed : getIngredients()) {
+            for (Ingredient inv : inventory) {
+                if (inv.getName().equalsIgnoreCase(needed.getName())) {
+                    inv.setAmount(inv.getAmount() - needed.getAmount());
+                }
+            }
+        }
+        System.out.println("Preparado el postre: " + getName());
     }
 }
